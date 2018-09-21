@@ -1,11 +1,9 @@
 package lambdasinaction._02stream.collect;
 
 import static java.util.stream.Collectors.*;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.toSet;
+import static java.util.Comparator.*;
 import static lambdasinaction._02stream.collect.Dish.menu;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +12,7 @@ import java.util.Set;
 public class _04GroupingDishes {
 
     enum CaloricLevel { DIET, NORMAL, FAT };
-
+    
     public static void main(String ... args) {
         System.out.println("Dishes grouped by type: " + groupDishesByType());
         System.out.println("Dishes grouped by caloric level: " + groupDishesByCaloricLevel());
@@ -28,33 +26,51 @@ public class _04GroupingDishes {
 
     //1. type별 그룹핑
     private static Map<Dish.Type, List<Dish>> groupDishesByType() {
-        return null;
+        return menu.stream().collect(groupingBy(Dish::getType));
     }
     //2. 칼로리별 그룹핑
     private static Map<CaloricLevel, List<Dish>> groupDishesByCaloricLevel() {
-        return null;
+        return menu.stream().collect(groupingBy(dish -> {
+        	if(dish.getCalories() <= 400) {
+        		return CaloricLevel.DIET;
+        	} else if(dish.getCalories() <= 700) {
+        		return CaloricLevel.NORMAL;
+        	} else {
+        		return CaloricLevel.FAT;
+        	}
+        }));
     }
     //3. type별로 그룹핑 후에 다시 칼로리별로 그룹핑
     private static Map<Dish.Type, Map<CaloricLevel, List<Dish>>> groupDishedByTypeAndCaloricLevel() {
-        return null;
+        return menu.stream().collect(groupingBy(Dish::getType, groupingBy(dish -> {
+        	if(dish.getCalories() <= 400) {
+        		return CaloricLevel.DIET;
+        	} else if(dish.getCalories() <= 700) {
+        		return CaloricLevel.NORMAL;
+        	} else {
+        		return CaloricLevel.FAT;
+        	}
+        })));
     }
     //4. type별 갯수 카운팅
     private static Map<Dish.Type, Long> countDishesInGroups() {
-        return null;
+        return menu.stream().collect(groupingBy(Dish::getType, counting()));
     }
     //5. type별 그룹에서 가장 칼로리가 높은 Dish 찾기
-    private static Map<Dish.Type, Optional<Dish>> mostCaloricDishesByType() {
-        return null;
+    private static Map<Dish.Type, Dish> mostCaloricDishesByType() {
+        return menu.stream()
+        		   .collect(groupingBy(Dish::getType, collectingAndThen(maxBy(comparingInt(Dish::getCalories)), Optional<Dish>::get)));
     }
     //5.1 type별 그룹에서 가장 칼로리가 높은 Dish 찾기 - collectingAndThen() 사용
-    private static Map<Dish.Type, Dish> mostCaloricDishesByTypeWithoutOptionals() {
-        return null;
-        		    
+    private static Map<Dish.Type, Optional<Dish>> mostCaloricDishesByTypeWithoutOptionals() {
+        return menu.stream()
+        		   .collect(groupingBy(Dish::getType, maxBy((dish1, dish2) -> dish1.getCalories() - dish2.getCalories())));
     }
 
     //6. type별로 그룹핑하여 칼로리의 합계 내기
     private static Map<Dish.Type, Integer> sumCaloriesByType() {
-        return null;
+        return menu.stream()
+     		   .collect(groupingBy(Dish::getType, summingInt(Dish::getCalories)));
     }
 
     private static Map<Dish.Type, Set<CaloricLevel>> caloricLevelsByType() {

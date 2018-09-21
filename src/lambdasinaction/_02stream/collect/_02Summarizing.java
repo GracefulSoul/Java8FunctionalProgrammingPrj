@@ -1,13 +1,13 @@
 package lambdasinaction._02stream.collect;
 
 import java.util.*;
-import java.util.function.*;
 
 import static java.util.stream.Collectors.*;
+import static java.util.Comparator.*;
 import static lambdasinaction._02stream.collect.Dish.menu;
 
 public class _02Summarizing {
-
+    
     public static void main(String ... args) {
         System.out.println("Nr. of dishes: " + howManyDishes());
         System.out.println("The most caloric dish is: " + findMostCaloricDish());
@@ -19,15 +19,13 @@ public class _02Summarizing {
         System.out.println("Short menu comma separated: " + getShortMenuCommaSeparated());
     }
 
-
     private static long howManyDishes() {
         return menu.stream().collect(counting());
     }
 
     //1. Comparator를 사용한 collect(), reducing()
     private static Dish findMostCaloricDishUsingComparator() {
-
-        return null;
+        return menu.stream().collect(maxBy(comparingInt(Dish::getCalories))).get();
     }
 
     //collect() - reducing 사용
@@ -37,28 +35,26 @@ public class _02Summarizing {
 
     //2.  summingInt() 사용
     private static int calculateTotalCalories() {
-
-        return 0;
+        return menu.stream().collect(summingInt(Dish::getCalories)).intValue();
     }
 
     //3. averagingInt() 사용
     private static Double calculateAverageCalories() {
-
-        return 0.0;
+        return menu.stream().collect(averagingInt(Dish::getCalories)).doubleValue();
     }
 
     //4. summarizingInt() 사용
     private static IntSummaryStatistics calculateMenuStatistics() {
-        return null;
+        return menu.stream().collect(summarizingInt(Dish::getCalories));
     }
 
     //5. joining() 사용
     private static String getShortMenu() {
-
-        return "";
+        return menu.stream().map(Dish::getName).collect(joining("/"));
     }
 
     private static String getShortMenuCommaSeparated() {
         return menu.stream().map(Dish::getName).collect(joining(", "));
     }
+    
 }

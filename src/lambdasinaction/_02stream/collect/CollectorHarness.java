@@ -20,4 +20,5 @@ public class CollectorHarness {
         }
         return fastest;
     }
+    
 }

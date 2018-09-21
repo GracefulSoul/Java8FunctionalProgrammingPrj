@@ -2,7 +2,7 @@ package lambdasinaction._02stream.collect;
 
 import java.util.*;
 
-import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.*;
 
 public class _01GroupingTransactions {
 
@@ -23,7 +23,18 @@ public class _01GroupingTransactions {
     public static void main(String ... args) {
         groupImperatively();
         groupFunctionally();
-
+        
+        //Currency 별 Transaction을 Grouping 한 후에 Transaction의 합계를 계산.
+        Map<Currency, Double> txSumByCurrency =
+    			transactions.stream()
+    						.collect(groupingBy(Transaction::getCurrency, summingDouble(Transaction::getValue)));
+        System.out.println(txSumByCurrency);
+        
+        //Currency 별 Transaction을 Grouping 한 후에 Transaction이 5000을 초과하는 경우 구분.
+        Map<Currency, Map<Boolean, List<Transaction>>> tx500gtByCurrency =
+        		transactions.stream()
+        					.collect(groupingBy(Transaction::getCurrency, partitioningBy(transaction -> transaction.getValue() > 5000)));
+        System.out.println(tx500gtByCurrency);
     }
     //Java 7
     private static void groupImperatively() {
@@ -42,10 +53,11 @@ public class _01GroupingTransactions {
     }
 
     //Java8 groupingBy 사용
+    //Currency 별 Transaction을 grouping.
     private static void groupFunctionally() {
-
-
-
+    	Map<Currency, List<Transaction>> txByCurrency = transactions.stream()
+    																.collect(groupingBy(transaction -> transaction.getCurrency()));
+    	System.out.println(txByCurrency);
     }
 
     public static class Transaction {
